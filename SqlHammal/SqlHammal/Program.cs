@@ -60,7 +60,7 @@ void Menu()
     if (copyType == "Copy Top Number ")
     {
         var topCount = getTopCountNumber();
-        selectTop = $" SELECT {topCount} ";
+        selectTop = $" TOP {topCount} ";
     }
 
     Run();
