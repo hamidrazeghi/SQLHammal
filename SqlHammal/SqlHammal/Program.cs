@@ -89,6 +89,13 @@ void Run()
                 string[] tableParts = fullTableName.Split('.');
                 string schemaName = tableParts[0];
                 string tableName = tableParts[1];
+                if(tableParts.Length > 2)
+                {
+                     schemaName = $"{tableParts[0]}.{tableParts[1]}";
+                     tableName = tableParts[2];
+                }
+
+
                 Console.WriteLine($"Proccessing Table => {schemaName}.{tableName} ");
 
 
@@ -103,7 +110,10 @@ void Run()
                     schemaAdapter.Fill(schemaTable);
                 }
 
-                bool hasIdentityColumn = schemaTable.AsEnumerable().Any(row => row.Field<int>("IsIdentity") == 1);
+                //bool hasIdentityColumn = schemaTable.AsEnumerable().Any(row => row.Field<int>("IsIdentity") == 1);
+
+                bool hasIdentityColumn = schemaTable.AsEnumerable().Any(row => !row.IsNull("IsIdentity") && row.Field<int>("IsIdentity") == 1);
+
 
                 string[] columnNames = schemaTable.AsEnumerable().Select(r => r.Field<string>("COLUMN_NAME")).ToArray();
                 string columnList = string.Join(", ", columnNames);
@@ -128,7 +138,7 @@ void Run()
                     }
 
 
-                    string selectQuery = $"SELECT {selectTop} * FROM {schemaName}.{tableName} ORDER BY 1 DESC";
+                    string selectQuery = $"SELECT {selectTop} * FROM [{schemaName}].{tableName} ORDER BY 1 DESC";
                     using (SqlCommand selectCommand = new SqlCommand(selectQuery, sourceConnection))
                     using (SqlDataReader reader = selectCommand.ExecuteReader())
                     {
